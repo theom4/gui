@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2000:80"
+    # For static sites served by nginx, env vars are baked at build time.
+    # Ensure your Vite vars exist in `.env` before building.
+    # If you need different values per environment, consider multiple .env files
+    # and pass the mode via build args or separate compose profiles.

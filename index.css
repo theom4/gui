@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Analytics Dashboard Design System - Dark Theme with Purple/Blue Accents */
+
+@layer base {
+  :root {
+    /* Dark theme base colors */
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+
+    /* Card and surface colors */
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+
+    /* Interactive elements */
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary brand colors - Dark Turquoise */
+    --primary: 185 80% 45%;
+    --primary-foreground: 210 40% 98%;
+    --primary-glow: 185 80% 55%;
+
+    /* Secondary colors */
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted colors for subtle elements */
+    --muted: 222 47% 10%;
+    --muted-foreground: 215.4 16.3% 65%;
+
+    /* Accent colors */
+    --accent: 222 47% 12%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Status colors */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+
+    /* Borders and inputs */
+    --border: 222 47% 15%;
+    --input: 222 47% 12%;
+    --ring: 185 80% 45%;
+
+    /* Design system tokens */
+    --radius: 0.75rem;
+    
+    /* Custom gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(185 80% 45%), hsl(185 80% 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(222 47% 12%), hsl(222 47% 8%));
+    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(152 76% 46%));
+    
+    /* Glass effect */
+    --glass-bg: hsl(222 47% 8% / 0.8);
+    --glass-border: hsl(210 40% 98% / 0.1);
+    
+    /* Shadows with brand color */
+    --shadow-primary: 0 10px 30px -10px hsl(185 80% 45% / 0.3);
+    --shadow-card: 0 4px 20px -4px hsl(222 47% 5% / 0.5);
+    
+    /* Animation easing */
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Sidebar colors for dark theme */
+    --sidebar-background: 222 47% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 185 80% 45%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 222 47% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 222 47% 15%;
+    --sidebar-ring: 185 80% 45%;
+  }
+
+  /* Light theme fallback - keeping dark as primary */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.8);
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+  
+  .shadow-primary {
+    box-shadow: var(--shadow-primary);
+  }
+  
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .animate-smooth {
+    transition: all 0.3s var(--ease-smooth);
+  }
+  
+  .animate-bounce-in {
+    animation: bounce-in 0.6s var(--ease-bounce);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
