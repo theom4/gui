@@ -24,6 +24,8 @@ export interface CallRecording {
   created_at: string;
   duration_seconds: number | null;
   recording_url: string;
+  recording_transcript: string | null;
+  phone_number: string | null;
 }
 
 interface CallRecordingsResult {
@@ -31,28 +33,72 @@ interface CallRecordingsResult {
   total: number;
 }
 
+import { DateRange } from "react-day-picker";
+
 /**
  * Fetch latest recordings with limit
  */
 async function fetchLatestRecordings(
   userId: string,
-  limit: number = 20
+  limit: number = 20,
+  dateRange?: DateRange
 ): Promise<CallRecording[]> {
-  const { data, error } = await supabase
-    .from('call_recordings' as any)
-    .select('id,user_id,created_at,duration_seconds,recording_url')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
+  console.log('[CallRecordings] Fetching for user:', userId, 'Limit:', limit, 'DateRange:', dateRange);
 
-  if (error) throw error;
-  return (data as CallRecording[]) || [];
+  try {
+    let query = supabase
+      .from('call_recordings' as any)
+      .select('id,user_id,created_at,duration_seconds,recording_url,recording_transcript,phone_number')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (dateRange?.from) {
+      const fromDate = new Date(dateRange.from);
+      fromDate.setHours(0, 0, 0, 0); // Ensure we start at beginning of day
+      const fromISO = fromDate.toISOString();
+      console.log('[CallRecordings] Filter From:', fromISO);
+      query = query.gte('created_at', fromISO);
+    }
+
+    if (dateRange?.to) {
+      // End of the day
+      const toDate = new Date(dateRange.to);
+      toDate.setHours(23, 59, 59, 999);
+      query = query.lte('created_at', toDate.toISOString());
+      console.log('[CallRecordings] Filter To:', toDate.toISOString());
+    }
+
+    // If filtering by date, we might want to increase the limit or rely on the user to use pagination (infinite scroll).
+    // For now, let's keep the limit but maybe increase it slightly or just respect it as "top N results within filtered range"
+    query = query.limit(limit);
+
+    console.log('[CallRecordings] Executing Supabase query...');
+
+    // Add timeout to diagnose hanging queries
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Query timeout after 10 seconds')), 10000);
+    });
+
+    const result = await Promise.race([query, timeoutPromise]) as any;
+    const { data, error } = result;
+
+    if (error) {
+      console.error('[CallRecordings] Supabase Error:', error);
+      throw error;
+    }
+
+    console.log('[CallRecordings] Success. Rows found:', data?.length);
+    return (data as CallRecording[]) || [];
+  } catch (err) {
+    console.error('[CallRecordings] Unexpected error in fetch:', err);
+    throw err;
+  }
 }
 
 /**
  * Main Hook - Optimized Call Recordings with Smart Realtime
  */
-export const useCallRecordingsOptimized = (limit: number = 20) => {
+export const useCallRecordingsOptimized = (limit: number = 20, dateRange?: DateRange) => {
   const { profile } = useAuth();
   const queryClient = useQueryClient();
   const realtimeChannelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
@@ -62,8 +108,8 @@ export const useCallRecordingsOptimized = (limit: number = 20) => {
 
   // React Query
   const query = useQuery({
-    queryKey: queryKeys.callRecordings.latest(userId || ''),
-    queryFn: () => fetchLatestRecordings(userId!, limit),
+    queryKey: [...queryKeys.callRecordings.latest(userId || ''), dateRange], // Include dateRange in query key
+    queryFn: () => fetchLatestRecordings(userId!, limit, dateRange),
     enabled: !!userId,
     staleTime: 60_000, // 1 minute - recordings don't change once created
     refetchOnWindowFocus: true,
@@ -73,6 +119,14 @@ export const useCallRecordingsOptimized = (limit: number = 20) => {
   // Smart Realtime - Only for INSERT events (new recordings)
   useEffect(() => {
     if (!userId || !query.data) return;
+
+    // If a date filter is active and it doesn't include "today" approx, maybe disable realtime?
+    // But keeping it simple: any new recording triggers a specific key invalidation.
+    // If we filter by date, the key includes the date.
+    // So we should invalidate queries effectively. 
+    // Actually invalidateQueries matching the base key will invalidate all variations (with different date ranges) if we use prefix matching,
+    // but here we used exact keys?
+    // queryKeys.callRecordings.latest returns an array.
 
     // Cleanup old channel
     if (realtimeChannelRef.current) {
@@ -89,8 +143,9 @@ export const useCallRecordingsOptimized = (limit: number = 20) => {
 
       debounceTimerRef.current = setTimeout(() => {
         console.log('[CallRecordings] New recording detected, refetching...');
-        queryClient.invalidateQueries({ queryKey: queryKeys.callRecordings.latest(userId) });
-      }, 500); // 500ms debounce - shorter than metrics (user is waiting actively)
+        // Invalidate ALL recordings queries for this user, so that any date filter view updates if needed
+        queryClient.invalidateQueries({ queryKey: ['call_recordings', userId] as any });
+      }, 500); // 500ms debounce
     };
 
     // Setup realtime subscription - ONLY for INSERT
@@ -122,7 +177,7 @@ export const useCallRecordingsOptimized = (limit: number = 20) => {
         realtimeChannelRef.current = null;
       }
     };
-  }, [userId, queryClient, query.data]);
+  }, [userId, queryClient, query.data]); // Re-sub if userId changes
 
   return {
     recordings: query.data || [],
@@ -149,7 +204,7 @@ export const useCallRecordingsInfinite = (pageSize: number = 20) => {
 
       const { data, error } = await supabase
         .from('call_recordings' as any)
-        .select('id,user_id,created_at,duration_seconds,recording_url', { count: 'exact' })
+        .select('id,user_id,created_at,duration_seconds,recording_url,client_personal_id,recording_transcript,phone_number', { count: 'exact' })
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .range(pageParam, pageParam + pageSize - 1);

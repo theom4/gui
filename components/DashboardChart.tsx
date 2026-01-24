@@ -13,6 +13,60 @@ import {
 } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect, useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
+import { useAuth } from "@/auth/AuthContext"
+
+export function DashboardChart() {
+  const { profile } = useAuth();
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchChartData() {
+      if (!profile?.id) return;
+
+      try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const { data: recordings, error } = await supabase
+          .from('call_recordings' as any)
+          .select('created_at')
+          .eq('user_id', profile.id)
+          .gte('created_at', today.toISOString());
+
+        if (error) throw error;
+
+        // Process data for the chart (hourly volume)
+        const hourlyData = Array.from({ length: 24 }, (_, i) => ({
+          name: i.toString().padStart(2, '0'),
+          peakHour: 0,
+          avgHour: 0 // We can use this for avg duration if we want, or just volume compared to avg
+        }));
+
+        recordings?.forEach(rec => {
+          const hour = new Date(rec.created_at).getHours();
+          if (hourlyData[hour]) {
+            hourlyData[hour].peakHour++;
+          }
+        });
+
+        setData(hourlyData);
+      } catch (err: any) {
+        console.error('Error fetching chart data:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchChartData();
+  }, [profile?.id]);
+
+  return <RevenueChart data={data} loading={loading} error={error} />;
+}
 
 interface ChartProps {
   data: any[];
@@ -47,14 +101,14 @@ export function RevenueChart({ data, loading, error }: ChartProps) {
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="name" 
+          <XAxis
+            dataKey="name"
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
@@ -62,19 +116,19 @@ export function RevenueChart({ data, loading, error }: ChartProps) {
             domain={[0, 24]}
             tickFormatter={(value) => `${value}:00`}
           />
-          <Line 
-            type="monotone" 
-            dataKey="peakHour" 
-            stroke="hsl(var(--primary))" 
+          <Line
+            type="monotone"
+            dataKey="peakHour"
+            stroke="hsl(var(--primary))"
             strokeWidth={3}
             dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 4 }}
             activeDot={{ r: 6, stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
             name="Ora de vârf"
           />
-          <Line 
-            type="monotone" 
-            dataKey="avgHour" 
-            stroke="hsl(var(--primary-glow))" 
+          <Line
+            type="monotone"
+            dataKey="avgHour"
+            stroke="hsl(var(--primary-glow))"
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={false}
@@ -92,22 +146,22 @@ export function VisitorChart({ data, loading, error }: ChartProps) {
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-          <XAxis 
-            dataKey="name" 
+          <XAxis
+            dataKey="name"
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
-          <YAxis 
+          <YAxis
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
             tickLine={false}
             axisLine={false}
             domain={[0, 1000]}
           />
-          <Bar 
-            dataKey="visits" 
+          <Bar
+            dataKey="visits"
             fill="hsl(var(--primary))"
             radius={[4, 4, 0, 0]}
             className="opacity-80 hover:opacity-100 transition-opacity"
@@ -144,8 +198,8 @@ export function DeviceChart({ data, loading, error }: ChartProps) {
         <div className="mt-4 grid grid-cols-2 gap-2">
           {data.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
+              <div
+                className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: pieColors[index % pieColors.length] }}
               />
               <span className="text-sm text-muted-foreground">{item.name}</span>

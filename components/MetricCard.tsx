@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 interface MetricCardProps {
   title: string
   value: string | number
+  description?: string
   change?: number
   changeLabel?: string
   icon?: React.ElementType
@@ -15,6 +16,7 @@ interface MetricCardProps {
 export function MetricCard({
   title,
   value,
+  description,
   change,
   changeLabel,
   icon: Icon,
@@ -58,6 +60,11 @@ export function MetricCard({
           <p className="text-3xl font-bold tracking-tight">
             {value}
           </p>
+          {description && (
+            <p className="text-xs text-muted-foreground">
+              {description}
+            </p>
+          )}
           {(change !== undefined || changeLabel) && (
             <div className="flex items-center space-x-2 text-sm">
               {change !== undefined && TrendIcon && (

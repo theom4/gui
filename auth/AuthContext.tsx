@@ -50,10 +50,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Clear cache to force fresh fetch
     try {
       localStorage.removeItem(cacheKey);
-    } catch {}
+    } catch { }
 
     try {
-      const profileData = await getProfile(session.user.id);
+      const profileData = await getProfile(session.user.id, session.access_token);
       if (profileData) {
         const freshProfile = {
           id: session.user.id,
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Update cache with fresh data
         try {
           localStorage.setItem(cacheKey, JSON.stringify(freshProfile));
-        } catch {}
+        } catch { }
       }
     } catch (error) {
       console.error('Failed to refresh profile:', error);
@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
           try {
             // Always fetch fresh profile data to ensure role is correct
-            const profileData = await getProfile(session.user.id);
+            const profileData = await getProfile(session.user.id, session.access_token);
             if (!isMounted) return;
 
             if (profileData) {
@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               // Update cache with fresh data
               try {
                 localStorage.setItem(cacheKey, JSON.stringify(freshProfile));
-              } catch {}
+              } catch { }
             } else {
               setProfile({ id: session.user.id, role: 'user' });
             }
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         const cacheKey = `profile:${session.user.id}`;
         try {
-          const profileData = await getProfile(session.user.id);
+          const profileData = await getProfile(session.user.id, session.access_token);
           if (!isMounted) return;
           if (profileData) {
             setProfile({
@@ -157,7 +157,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                   avatar_url: (profileData.avatar_url as string | null) ?? null,
                 } satisfies UserProfile)
               );
-            } catch {}
+            } catch { }
           } else {
             setProfile({ id: session.user.id, role: 'user' });
           }
@@ -199,7 +199,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const cacheKey = `profile:${session.user.id}`;
             try {
               localStorage.setItem(cacheKey, JSON.stringify(freshProfile));
-            } catch {}
+            } catch { }
           }
         )
         .subscribe();

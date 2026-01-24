@@ -19,14 +19,16 @@ import {
 } from "@/components/ui/sidebar"
 
 const items = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Automations", url: "/automations", icon: Zap },
-  { title: "Call Recordings", url: "/call-recordings", icon: Phone },
+  { title: "Panou de Control", url: "/", icon: LayoutDashboard },
+  { title: "Automatizări", url: "/automations", icon: Zap },
+  { title: "Înregistrări Apeluri", url: "/call-recordings", icon: Phone },
   { title: "CRM", url: "#", icon: Users },
-  { title: "Campaigns", url: "/campaigns", icon: Megaphone },
+  { title: "Campanii", url: "/campaigns", icon: Megaphone },
   { title: "AI Chat", url: "/chat", icon: MessagesSquare },
   { title: "WhatsApp", url: "/whatsapp", icon: MessageCircle },
+  { title: "Setări", url: "/settings", icon: Settings },
 ]
+
 
 export function AppSidebar() {
   const { state } = useSidebar()
@@ -50,24 +52,26 @@ export function AppSidebar() {
   }, [profile?.avatar_url, profile?.role])
 
   const handleSignOut = async () => {
+    console.log('[AppSidebar] Sign out initiated');
     try {
       const { error } = await supabase.auth.signOut()
       if (error) {
-        console.error('Sign out error:', error)
+        console.error('[AppSidebar] Sign out error:', error)
         toast({
-          title: "Sign Out Failed",
+          title: "Deconectare eșuată",
           description: error.message,
           variant: "destructive",
         })
         return
       }
+      console.log('[AppSidebar] Sign out successful, navigating to /auth');
       // Force navigation to auth in addition to auth listener
       navigate('/auth', { replace: true })
     } catch (e: unknown) {
-      console.error('Unexpected error during sign out:', e)
+      console.error('[AppSidebar] Unexpected error during sign out:', e)
       toast({
-        title: "An Unexpected Error Occurred",
-        description: e instanceof Error ? e.message : "Please try signing out again.",
+        title: "Eroare neașteptată",
+        description: e instanceof Error ? e.message : "Te rugăm să încerci din nou.",
         variant: "destructive",
       })
     }
@@ -75,8 +79,8 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive 
-      ? "relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-primary before:rounded-r bg-white text-primary font-medium" 
+    isActive
+      ? "relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-primary before:rounded-r bg-white text-primary font-medium"
       : "hover:bg-muted/50"
 
   return (
@@ -94,7 +98,7 @@ export function AppSidebar() {
                 className={`${collapsed ? 'h-12 w-12' : 'h-20 w-full'} object-contain select-none`}
                 draggable={false}
                 loading="eager"
-                fetchpriority="high"
+                fetchPriority="high"
               />
             ) : profile?.avatar_url && (
               <img
@@ -103,13 +107,13 @@ export function AppSidebar() {
                 className={`${collapsed ? 'h-12 w-12' : 'h-20 w-full'} object-contain select-none`}
                 draggable={false}
                 loading="eager"
-                fetchpriority="high"
+                fetchPriority="high"
               />
             )}
           </div>
         </div>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel>Meniu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               {items.map((item) => {
@@ -143,7 +147,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup className="mt-auto">
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>Cont</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
               <SidebarMenuItem>
@@ -156,31 +160,25 @@ export function AppSidebar() {
                       : "bg-transparent hover:bg-muted/50"
                   }
                 >
-                  <NavLink to="/settings" end className="flex items-center">
+                  <NavLink to="/account" end className="flex items-center">
                     <Users className="h-4 w-4" />
-                    {!collapsed && <span className="ml-2">User Account</span>}
+                    {!collapsed && <span className="ml-2">Cont Utilizator</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <button
-                  role="menuitem"
-                  tabIndex={0}
-                  onClick={async (e) => {
-                    e.preventDefault()
-                    await handleSignOut()
+                <SidebarMenuButton
+                  onClick={(e) => {
+                    e.preventDefault();
+                    console.log('[AppSidebar] Logout button clicked');
+                    handleSignOut();
                   }}
-                  onKeyDown={async (e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault()
-                      await handleSignOut()
-                    }
-                  }}
-                  className="w-full h-8 text-sm flex items-center gap-2 px-2 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 outline-none pointer-events-auto relative z-10"
+                  className="cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  data-testid="logout-button"
                 >
                   <LogOut className="h-4 w-4" />
-                  {!collapsed && <span>Sign Out</span>}
-                </button>
+                  {!collapsed && <span>Deconectare</span>}
+                </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>

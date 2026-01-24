@@ -28,6 +28,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Automations from "./pages/Automations";
 import SettingsPage from "./pages/Settings";
+import Account from "./pages/Account";
 import Campaigns from "./pages/Campaigns";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
@@ -43,7 +44,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <PageTitle />
         <AuthProvider>
           <AppRoutes />
@@ -112,6 +113,7 @@ const UserLayout = () => (
             <Route path="/chat" element={<Chat />} />
             <Route path="/whatsapp" element={<WhatsApp />} />
             <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/account" element={<Account />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
@@ -228,7 +230,7 @@ function UserAvatarButton({ onLogout, displayName }: { onLogout?: () => void; di
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{name}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem onSelect={() => onLogout && onLogout()}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
