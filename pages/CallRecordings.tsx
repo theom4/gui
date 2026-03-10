@@ -126,7 +126,7 @@ export default function CallRecordings() {
 
             {/* Popup Dialog */}
             <Dialog open={!!selectedRecording} onOpenChange={(open) => { if (!open) setSelectedRecording(null); }}>
-                <DialogContent className="sm:max-w-lg">
+                <DialogContent className="sm:max-w-4xl">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Phone className="h-5 w-5 text-primary" />
@@ -151,22 +151,38 @@ export default function CallRecordings() {
                         </audio>
                     </div>
 
-                    {/* Transcript */}
-                    <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                            <FileText className="h-4 w-4" />
-                            Transcript
+                    {/* Two column layout */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Transcript */}
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                                <FileText className="h-4 w-4" />
+                                Transcript
+                            </div>
+                            <div className="h-[300px] w-full overflow-y-auto rounded-md border p-3 text-sm bg-muted/50">
+                                {selectedRecording?.recording_transcript ? (
+                                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                                        {selectedRecording.recording_transcript}
+                                    </p>
+                                ) : (
+                                    <p className="text-muted-foreground italic text-xs">
+                                        No transcript available for this recording.
+                                    </p>
+                                )}
+                            </div>
                         </div>
-                        <div className="h-[300px] w-full overflow-y-auto rounded-md border p-3 text-sm bg-muted/50">
-                            {selectedRecording?.recording_transcript ? (
-                                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                                    {selectedRecording.recording_transcript}
-                                </p>
-                            ) : (
+
+                        {/* Detalii */}
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                                <FileText className="h-4 w-4" />
+                                Detalii
+                            </div>
+                            <div className="h-[300px] w-full overflow-y-auto rounded-md border p-3 text-sm bg-muted/50">
                                 <p className="text-muted-foreground italic text-xs">
-                                    No transcript available for this recording.
+                                    Nicio informație disponibilă momentan.
                                 </p>
-                            )}
+                            </div>
                         </div>
                     </div>
                 </DialogContent>
