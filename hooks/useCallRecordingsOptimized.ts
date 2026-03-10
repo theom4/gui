@@ -27,6 +27,7 @@ export interface CallRecording {
   recording_transcript: string | null;
   phone_number: string | null;
   client_personal_id: string | null;
+  direction: string | null;
 }
 
 interface CallRecordingsResult {
@@ -49,7 +50,7 @@ async function fetchLatestRecordings(
   try {
     let query = supabase
       .from('call_recordings' as any)
-      .select('id,user_id,created_at,duration_seconds,recording_url,recording_transcript,phone_number,client_personal_id')
+      .select('id,user_id,created_at,duration_seconds,recording_url,recording_transcript,phone_number,client_personal_id,direction')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 

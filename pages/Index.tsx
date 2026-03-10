@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, PhoneIncoming, PhoneOutgoing, Clock, TrendingUp } from "lucide-react";
 import { DashboardChart } from "@/components/DashboardChart";
 import { MetricCard } from "@/components/MetricCard";
+import { useCallRecordingsOptimized } from "@/hooks/useCallRecordingsOptimized";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
@@ -31,6 +32,7 @@ export default function Index() {
 
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
+    const { recordings: recentRecordings } = useCallRecordingsOptimized(5);
 
     useEffect(() => {
         console.log('[Dashboard] useEffect triggered. Profile:', profile);
@@ -370,44 +372,51 @@ export default function Index() {
                             <thead className="text-xs uppercase bg-muted/50">
                                 <tr>
                                     <th scope="col" className="px-6 py-3">Telefon</th>
-                                    <th scope="col" className="px-6 py-3">Acțiune</th>
+                                    <th scope="col" className="px-6 py-3">Direcție</th>
                                     <th scope="col" className="px-6 py-3">Data</th>
                                     <th scope="col" className="px-6 py-3">Durată apel</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* Sample data - will be replaced with real data */}
-                                {[1, 2, 3, 4, 5].map((item) => (
-                                    <tr key={item} className="border-b hover:bg-muted/30 transition-colors">
-                                        <td className="px-6 py-4 font-medium">+40 7XX XXX XXX</td>
-                                        <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                Programare (sosire)
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            {new Date(Date.now() - item * 3600000).toLocaleDateString('ro-RO', {
-                                                day: '2-digit',
-                                                month: '2-digit',
-                                                year: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit'
-                                            })}
-                                        </td>
-                                        <td className="px-6 py-4 text-muted-foreground">
-                                            {Math.floor(Math.random() * 5) + 1}:{String(Math.floor(Math.random() * 60)).padStart(2, '0')}
+                                {recentRecordings.length > 0 ? (
+                                    recentRecordings.map((rec) => (
+                                        <tr key={rec.id} className="border-b hover:bg-muted/30 transition-colors">
+                                            <td className="px-6 py-4 font-medium">{rec.phone_number || '—'}</td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                    rec.direction === 'outbound'
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-blue-100 text-blue-800'
+                                                }`}>
+                                                    {rec.direction === 'outbound' ? 'Apel efectuat' : 'Apel primit'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-muted-foreground">
+                                                {new Date(rec.created_at).toLocaleDateString('ro-RO', {
+                                                    day: '2-digit',
+                                                    month: '2-digit',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </td>
+                                            <td className="px-6 py-4 text-muted-foreground">
+                                                {rec.duration_seconds
+                                                    ? `${Math.floor(rec.duration_seconds / 60)}:${String(rec.duration_seconds % 60).padStart(2, '0')}`
+                                                    : '—'}
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={4} className="text-center py-8 text-muted-foreground">
+                                            <Phone className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                            <p className="text-sm">Nu există activitate recentă</p>
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                             </tbody>
                         </table>
-                        {/* Empty state for when there's no data */}
-                        {(!metrics || metrics.total_apeluri === 0) && (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <Phone className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                <p className="text-sm">Nu există activitate recentă</p>
-                            </div>
-                        )}
                     </div>
                 </CardContent>
             </Card>
