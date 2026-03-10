@@ -59,12 +59,34 @@ export default function Index() {
                     return;
                 }
 
+                let targetUserId = profile.id;
+
+                try {
+                    console.log('[Dashboard] Fetching from schema auth table users by email:', session.user.email);
+
+                    // The user requested to fetch from auth.users by email to get the ID
+                    const { data: authData, error: authErr } = await supabase
+                        .schema('auth')
+                        .from('users')
+                        .select('id')
+                        .eq('email', session.user.email)
+                        .maybeSingle();
+
+                    if (authData && authData.id) {
+                        console.log('[Dashboard] Successfully retrieved id from auth.users:', authData.id);
+                        targetUserId = authData.id;
+                    } else if (authErr) {
+                        console.warn('[Dashboard] Error fetching from auth.users (falling back to profile.id):', authErr);
+                    }
+                } catch (err) {
+                    console.warn('[Dashboard] Exception fetching from auth.users:', err);
+                }
 
                 // Use direct fetch to bypass Supabase client timeout issues
                 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ympkyaakwveogjcgqqnr.supabase.co';
-                const queryUrl = `${supabaseUrl}/rest/v1/call_metrics?user_id=eq.${profile.id}&select=*&order=created_at.desc&limit=1`;
+                const queryUrl = `${supabaseUrl}/rest/v1/call_metrics?user_id=eq.${targetUserId}&select=*&order=created_at.desc&limit=1`;
 
-                console.log('[Dashboard] Starting direct fetch query...');
+                console.log('[Dashboard] Starting direct fetch query for user_id:', targetUserId);
 
                 const response = await fetch(queryUrl, {
                     headers: {
@@ -282,35 +304,35 @@ export default function Index() {
                             <CardTitle className="text-base">Rata de Conversie</CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col items-center justify-center py-2">
-                            <div className="relative w-24 h-24">
+                            <div className="relative w-32 h-32">
                                 {/* Background circle */}
-                                <svg className="w-24 h-24 transform -rotate-90">
+                                <svg className="w-32 h-32 transform -rotate-90">
                                     <circle
-                                        cx="48"
-                                        cy="48"
-                                        r="40"
+                                        cx="64"
+                                        cy="64"
+                                        r="52"
                                         stroke="currentColor"
-                                        strokeWidth="6"
+                                        strokeWidth="8"
                                         fill="none"
                                         className="text-muted/20"
                                     />
                                     {/* Progress circle */}
                                     <circle
-                                        cx="48"
-                                        cy="48"
-                                        r="40"
+                                        cx="64"
+                                        cy="64"
+                                        r="52"
                                         stroke="currentColor"
-                                        strokeWidth="6"
+                                        strokeWidth="8"
                                         fill="none"
-                                        strokeDasharray={`${2 * Math.PI * 40}`}
-                                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - (metrics?.rata_conversie || 0) / 100)}`}
+                                        strokeDasharray={`${2 * Math.PI * 52}`}
+                                        strokeDashoffset={`${2 * Math.PI * 52 * (1 - (metrics?.rata_conversie || 0) / 100)}`}
                                         className="text-blue-500 transition-all duration-500"
                                         strokeLinecap="round"
                                     />
                                 </svg>
                                 {/* Percentage text */}
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-xl font-bold">
+                                    <span className="text-2xl font-bold">
                                         {metrics?.rata_conversie?.toFixed(1) || '0.0'}%
                                     </span>
                                 </div>
