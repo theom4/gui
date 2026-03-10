@@ -164,7 +164,7 @@ export default function Index() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Panou de Control</h1>
                     <p className="text-muted-foreground">
-                        Bine ai revenit! Iată o privire de ansamblu asupra activității tale.
+                        Statistici Robot
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
