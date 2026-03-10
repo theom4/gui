@@ -1,4 +1,4 @@
-import { Zap, Phone, Settings, Users, LayoutDashboard, Megaphone, MessagesSquare, MessageCircle, LogOut } from "lucide-react"
+import { Zap, Phone, Settings, Users, LayoutDashboard, Megaphone, MessagesSquare, MessageCircle, LogOut, BookOpen } from "lucide-react"
 import { NavLink, useLocation, useNavigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { useToast } from "@/components/ui/use-toast"
@@ -26,6 +26,7 @@ const items = [
   { title: "Campanii", url: "/campaigns", icon: Megaphone },
   { title: "AI Chat", url: "/chat", icon: MessagesSquare },
   { title: "WhatsApp", url: "/whatsapp", icon: MessageCircle },
+  { title: "Instrucțiuni", url: "/instructiuni", icon: BookOpen },
   { title: "Setări", url: "/settings", icon: Settings },
 ]
 

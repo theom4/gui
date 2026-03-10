@@ -1,0 +1,14 @@
+// INSTRUCTIONS: Replace lines 41-97 in pages/Index.tsx with this code:
+
+                // Use session from AuthContext (no need to call getSession)
+                if (!session) {
+                    console.warn('[Dashboard] No session available from AuthContext');
+                    setError('Nu există sesiune activă');
+                    setLoading(false);
+                    return;
+                }
+
+                console.log('[Dashboard] Using session from AuthContext:', {
+                    userId: session.user?.id,
+                    hasAccessToken: !!session.access_token
+                });

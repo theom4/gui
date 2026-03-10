@@ -34,6 +34,7 @@ import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import CallRecordings from "./pages/CallRecordings";
 import WhatsApp from "./pages/WhatsApp";
+import Instructiuni from "./pages/Instructiuni";
 
 import ManageUsers from "./pages/admin/ManageUsers";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -112,6 +113,7 @@ const UserLayout = () => (
             <Route path="/campaigns" element={<Campaigns />} />
             <Route path="/chat" element={<Chat />} />
             <Route path="/whatsapp" element={<WhatsApp />} />
+            <Route path="/instructiuni" element={<Instructiuni />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/account" element={<Account />} />
             <Route path="*" element={<NotFound />} />
