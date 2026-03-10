@@ -72,7 +72,7 @@ async function fetchLatestRecordings(
     // For now, let's keep the limit but maybe increase it slightly or just respect it as "top N results within filtered range"
     query = query.limit(limit);
 
-    console.log('[CallRecordings] Executing Supabase query...');
+    console.log('[CallRecordings] Executing Supabase query. URL:', (query as any).url?.toString());
 
     // Add timeout to diagnose hanging queries
     const timeoutPromise = new Promise<never>((_, reject) => {
@@ -87,7 +87,7 @@ async function fetchLatestRecordings(
       throw error;
     }
 
-    console.log('[CallRecordings] Success. Rows found:', data?.length);
+    console.log('[CallRecordings] Success. Rows found:', data?.length, 'Data:', data);
     return (data as CallRecording[]) || [];
   } catch (err) {
     console.error('[CallRecordings] Unexpected error in fetch:', err);
