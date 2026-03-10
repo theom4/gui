@@ -134,7 +134,7 @@ export default function CallRecordings() {
                             <FileText className="h-4 w-4" />
                             Transcript
                         </div>
-                        <ScrollArea className="max-h-[250px] w-full rounded-md border p-3 text-sm bg-muted/50">
+                        <div className="h-[300px] w-full overflow-y-auto rounded-md border p-3 text-sm bg-muted/50">
                             {selectedRecording?.recording_transcript ? (
                                 <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                                     {selectedRecording.recording_transcript}
@@ -144,7 +144,7 @@ export default function CallRecordings() {
                                     No transcript available for this recording.
                                 </p>
                             )}
-                        </ScrollArea>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>
