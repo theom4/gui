@@ -288,8 +288,8 @@ export default function Index() {
             </div>
 
             {/* Charts Section */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-8">
-                <Card className="col-span-5">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
+                <Card className="col-span-8">
                     <CardHeader>
                         <CardTitle>Imagine de Ansamblu a Activității</CardTitle>
                     </CardHeader>
@@ -299,42 +299,42 @@ export default function Index() {
                 </Card>
 
                 {/* Right side - stacked widgets */}
-                <div className="col-span-3 flex flex-col gap-4">
-                    {/* Circular Conversion Rate - Half height */}
+                <div className="col-span-4 flex flex-col gap-4">
+                    {/* Circular Conversion Rate */}
                     <Card className="flex-1">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base">Rata de Conversie</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex flex-col items-center justify-center py-2">
-                            <div className="relative w-32 h-32">
+                        <CardContent className="flex flex-col items-center justify-center py-4">
+                            <div className="relative w-40 h-40">
                                 {/* Background circle */}
-                                <svg className="w-32 h-32 transform -rotate-90">
+                                <svg className="w-40 h-40 transform -rotate-90">
                                     <circle
-                                        cx="64"
-                                        cy="64"
-                                        r="52"
+                                        cx="80"
+                                        cy="80"
+                                        r="66"
                                         stroke="currentColor"
-                                        strokeWidth="8"
+                                        strokeWidth="10"
                                         fill="none"
                                         className="text-muted/20"
                                     />
                                     {/* Progress circle */}
                                     <circle
-                                        cx="64"
-                                        cy="64"
-                                        r="52"
+                                        cx="80"
+                                        cy="80"
+                                        r="66"
                                         stroke="currentColor"
-                                        strokeWidth="8"
+                                        strokeWidth="10"
                                         fill="none"
-                                        strokeDasharray={`${2 * Math.PI * 52}`}
-                                        strokeDashoffset={`${2 * Math.PI * 52 * (1 - (metrics?.rata_conversie || 0) / 100)}`}
+                                        strokeDasharray={`${2 * Math.PI * 66}`}
+                                        strokeDashoffset={`${2 * Math.PI * 66 * (1 - (metrics?.rata_conversie || 0) / 100)}`}
                                         className="text-blue-500 transition-all duration-500"
                                         strokeLinecap="round"
                                     />
                                 </svg>
                                 {/* Percentage text */}
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-2xl font-bold">
+                                    <span className="text-3xl font-bold">
                                         {metrics?.rata_conversie?.toFixed(1) || '0.0'}%
                                     </span>
                                 </div>
@@ -342,17 +342,17 @@ export default function Index() {
                         </CardContent>
                     </Card>
 
-                    {/* Tichete create - Half height */}
+                    {/* Tichete create */}
                     <Card className="flex-1">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-base">Tichete create</CardTitle>
                         </CardHeader>
-                        <CardContent className="flex flex-col items-center justify-center py-2">
+                        <CardContent className="flex flex-col items-center justify-center py-4">
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-blue-500">
+                                <div className="text-4xl font-bold text-blue-500">
                                     {metrics?.total_apeluri || 0}
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <p className="text-sm text-muted-foreground mt-2">
                                     Total tichete
                                 </p>
                             </div>
