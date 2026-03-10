@@ -1,77 +1,66 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Settings as SettingsIcon, Save, FileText } from "lucide-react";
+import { Settings as SettingsIcon, Bot, CalendarClock, Phone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Switch } from "@/components/ui/switch";
 
-interface InstructionWidget {
+interface AgentToggle {
     id: string;
     title: string;
     description: string;
-    placeholder: string;
-    defaultValue: string;
+    icon: any;
+    disabled?: boolean;
 }
 
 export default function Settings() {
     const { toast } = useToast();
 
-    const [instructions, setInstructions] = useState<Record<string, string>>({
-        service: "Bună ziua! Vă mulțumim că ați apelat service-ul nostru. Pentru a programa o vizită, vă rugăm să ne furnizați următoarele informații:\n\n1. Numele și prenumele dumneavoastră\n2. Numărul de telefon\n3. Marca și modelul vehiculului\n4. Data și ora preferată pentru programare\n5. Descrierea problemei sau serviciul dorit\n\nVă vom confirma programarea în cel mai scurt timp posibil.",
-
-        orders: "Bună ziua! Pentru a plasa o comandă, vă rugăm să ne furnizați următoarele detalii:\n\n1. Numele complet\n2. Numărul de telefon\n3. Adresa de livrare\n4. Produsele dorite (cod sau descriere)\n5. Cantitatea pentru fiecare produs\n6. Metoda de plată preferată\n\nVă vom contacta pentru confirmarea comenzii și a detaliilor de livrare.",
-
-        arrivals: "Bună ziua! Vă mulțumim că ați sosit pentru programarea dumneavoastră. Vă rugăm să vă înregistrați la recepție cu următoarele informații:\n\n1. Numele complet\n2. Numărul programării\n3. Ora sosirii\n\nEchipa noastră vă va asista în cel mai scurt timp posibil. Vă mulțumim pentru punctualitate!",
-
-        confirmations: "Bună ziua! Confirmăm primirea comenzii dumneavoastră cu următoarele detalii:\n\n1. Număr comandă: [AUTO]\n2. Produse comandate: [LISTA]\n3. Valoare totală: [SUMA]\n4. Data estimată de livrare: [DATA]\n\nVeți primi un SMS de confirmare și veți fi contactat telefonic pentru detalii suplimentare. Vă mulțumim pentru comandă!"
+    const [activeAgents, setActiveAgents] = useState<Record<string, boolean>>({
+        orders: true,
+        service: true,
+        arrivals: false,
+        confirmations: false
     });
 
-    const widgets: InstructionWidget[] = [
-        {
-            id: "service",
-            title: "Instrucțiuni Programare Service",
-            description: "Instrucțiuni pentru clienții care doresc să programeze o vizită la service",
-            placeholder: "Introduceți instrucțiunile pentru programarea la service...",
-            defaultValue: instructions.service
-        },
+    const agents: AgentToggle[] = [
         {
             id: "orders",
-            title: "Instrucțiuni Plasare Comenzi",
-            description: "Ghid pentru clienții care doresc să plaseze o comandă",
-            placeholder: "Introduceți instrucțiunile pentru plasarea comenzilor...",
-            defaultValue: instructions.orders
+            title: "Agent Sunat comenzi sosite",
+            description: "Activează sau dezactivează asistentul vocal pentru comenzi.",
+            icon: Bot,
+        },
+        {
+            id: "service",
+            title: "Agent preluare programari",
+            description: "Activează sau dezactivează asistentul pentru programări la service.",
+            icon: CalendarClock,
         },
         {
             id: "arrivals",
-            title: "Instrucțiuni Programare (sosire)",
-            description: "Mesaj pentru clienții care au sosit pentru o programare",
-            placeholder: "Introduceți instrucțiunile pentru sosiri...",
-            defaultValue: instructions.arrivals
+            title: "Programari / Sosiri (În curând)",
+            description: "Activează primirea mesajelor de sosire pentru clienți.",
+            icon: Phone,
+            disabled: true,
         },
         {
             id: "confirmations",
-            title: "Instrucțiuni Confirmare Comenzi",
-            description: "Template pentru confirmarea comenzilor plasate",
-            placeholder: "Introduceți template-ul de confirmare comenzi...",
-            defaultValue: instructions.confirmations
+            title: "Confirmare Comenzi (În curând)",
+            description: "Activează template-urile de confirmare prin SMS/apel.",
+            icon: Bot,
+            disabled: true,
         }
     ];
 
-    const handleSave = (widgetId: string) => {
-        // Here you would save to Supabase or your backend
-        console.log(`Saving instructions for ${widgetId}:`, instructions[widgetId]);
+    const handleToggle = (agentId: string, checked: boolean) => {
+        setActiveAgents(prev => ({
+            ...prev,
+            [agentId]: checked
+        }));
 
         toast({
-            title: "Salvat cu succes!",
-            description: "Instrucțiunile au fost actualizate.",
+            title: "Setare actualizată",
+            description: `Agentul a fost ${checked ? "activat" : "dezactivat"}.`,
         });
-    };
-
-    const handleChange = (widgetId: string, value: string) => {
-        setInstructions(prev => ({
-            ...prev,
-            [widgetId]: value
-        }));
     };
 
     return (
@@ -82,53 +71,39 @@ export default function Settings() {
                     <SettingsIcon className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Setări</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Setări Agenți</h1>
                     <p className="text-muted-foreground">
-                        Configurați instrucțiunile pentru diferite procese de business
+                        Activează sau dezactivează agenții automatizați
                     </p>
                 </div>
             </div>
 
             {/* Instruction Widgets Grid */}
             <div className="grid gap-6 md:grid-cols-2">
-                {widgets.map((widget) => (
-                    <Card key={widget.id} className="flex flex-col">
-                        <CardHeader>
-                            <div className="flex items-start gap-3">
-                                <div className="p-2 bg-blue-100 rounded-lg">
-                                    <FileText className="h-5 w-5 text-blue-600" />
+                {agents.map((agent) => {
+                    const Icon = agent.icon;
+                    return (
+                        <Card key={agent.id} className={`flex flex-col ${agent.disabled ? "opacity-60" : ""}`}>
+                            <CardHeader className="flex flex-row items-center justify-between pb-3">
+                                <div className="flex items-start gap-4 space-y-0">
+                                    <div className="rounded-lg bg-primary/10 p-2">
+                                        <Icon className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <CardTitle className="text-lg">{agent.title}</CardTitle>
+                                        <CardDescription className="mt-1">{agent.description}</CardDescription>
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <CardTitle className="text-lg">{widget.title}</CardTitle>
-                                    <CardDescription className="mt-1">
-                                        {widget.description}
-                                    </CardDescription>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="flex-1 flex flex-col gap-4">
-                            <Textarea
-                                value={instructions[widget.id]}
-                                onChange={(e) => handleChange(widget.id, e.target.value)}
-                                placeholder={widget.placeholder}
-                                className="min-h-[200px] resize-none font-mono text-sm"
-                            />
-                            <div className="flex justify-between items-center">
-                                <span className="text-xs text-muted-foreground">
-                                    {instructions[widget.id].length} caractere
-                                </span>
-                                <Button
-                                    onClick={() => handleSave(widget.id)}
-                                    size="sm"
-                                    className="gap-2"
-                                >
-                                    <Save className="h-4 w-4" />
-                                    Salvează
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                                <Switch
+                                    checked={activeAgents[agent.id]}
+                                    onCheckedChange={(checked) => handleToggle(agent.id, checked)}
+                                    disabled={agent.disabled}
+                                    aria-label={`Toggle ${agent.title}`}
+                                />
+                            </CardHeader>
+                        </Card>
+                    );
+                })}
             </div>
 
             {/* Info Section */}
@@ -142,12 +117,10 @@ export default function Settings() {
                         </div>
                         <div>
                             <h3 className="font-semibold text-blue-900 mb-1">
-                                Cum să folosiți instrucțiunile
+                                Gestionarea Agenților
                             </h3>
                             <p className="text-sm text-blue-800">
-                                Aceste instrucțiuni vor fi folosite automat în comunicarea cu clienții.
-                                Puteți folosi variabile precum [AUTO], [LISTA], [SUMA], [DATA] care vor fi
-                                înlocuite automat cu informațiile relevante din sistem.
+                                Folosiți comutatoarele de mai sus pentru a activa sau dezactiva anumiți agenți asistenți. Un agent dezactivat nu va mai efectua sau prelua apeluri. Puteți edita instrucțiunile specifice ("prompts") în pagina <strong>Instrucțiuni</strong>.
                             </p>
                         </div>
                     </div>
