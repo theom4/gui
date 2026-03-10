@@ -140,28 +140,6 @@ export default function Instructiuni() {
                 })}
             </div>
 
-            {/* Info Section */}
-            <Card className="bg-blue-50 border-blue-200 mt-6">
-                <CardContent className="pt-6">
-                    <div className="flex gap-3">
-                        <div className="flex-shrink-0">
-                            <div className="p-2 bg-blue-100 rounded-full">
-                                <SettingsIcon className="h-5 w-5 text-blue-600" />
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-blue-900 mb-1">
-                                Cum să folosiți instrucțiunile
-                            </h3>
-                            <p className="text-sm text-blue-800">
-                                Aceste instrucțiuni vor fi folosite automat de către agenți în comunicarea cu clienții.
-                                Puteți folosi variabile precum [AUTO], [LISTA], [SUMA], [DATA] care vor fi
-                                înlocuite automat cu informațiile relevante din sistem.
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 }

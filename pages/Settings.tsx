@@ -17,7 +17,7 @@ export default function Settings() {
 
     const [activeAgents, setActiveAgents] = useState<Record<string, boolean>>({
         orders: true,
-        service: true,
+        service: false,
         arrivals: false,
         confirmations: false
     });
@@ -37,7 +37,7 @@ export default function Settings() {
         },
         {
             id: "arrivals",
-            title: "Programari / Sosiri (În curând)",
+            title: "Agent plasare comenzi",
             description: "Activează primirea mesajelor de sosire pentru clienți.",
             icon: Phone,
             disabled: true,
@@ -106,26 +106,6 @@ export default function Settings() {
                 })}
             </div>
 
-            {/* Info Section */}
-            <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="pt-6">
-                    <div className="flex gap-3">
-                        <div className="flex-shrink-0">
-                            <div className="p-2 bg-blue-100 rounded-full">
-                                <SettingsIcon className="h-5 w-5 text-blue-600" />
-                            </div>
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-blue-900 mb-1">
-                                Gestionarea Agenților
-                            </h3>
-                            <p className="text-sm text-blue-800">
-                                Folosiți comutatoarele de mai sus pentru a activa sau dezactiva anumiți agenți asistenți. Un agent dezactivat nu va mai efectua sau prelua apeluri. Puteți edita instrucțiunile specifice ("prompts") în pagina <strong>Instrucțiuni</strong>.
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 }
