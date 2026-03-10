@@ -60,7 +60,7 @@ export default function CallRecordings() {
         <div className="p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Call Recordings</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Apeluri Robot</h1>
                     <p className="text-muted-foreground">
                         {filteredRecordings.length} recordings found
                         {searchQuery && ` (din ${recordings.length})`}

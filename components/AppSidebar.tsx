@@ -21,7 +21,7 @@ import {
 const items = [
   { title: "Panou de Control", url: "/", icon: LayoutDashboard },
   { title: "Automatizări", url: "/automations", icon: Zap },
-  { title: "Înregistrări Apeluri", url: "/call-recordings", icon: Phone },
+  { title: "Apeluri Robot", url: "/call-recordings", icon: Phone },
   { title: "CRM", url: "#", icon: Users },
   { title: "Campanii", url: "/campaigns", icon: Megaphone },
   { title: "AI Chat", url: "/chat", icon: MessagesSquare },
