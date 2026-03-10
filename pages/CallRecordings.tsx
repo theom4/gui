@@ -1,11 +1,11 @@
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCallRecordingsOptimized, CallRecording } from "@/hooks/useCallRecordingsOptimized";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Play, FileText, Calendar, Phone, Clock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Play, FileText, Calendar, Phone, Clock, Search } from "lucide-react";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { DateRange } from "react-day-picker";
 import { startOfDay } from "date-fns";
@@ -21,6 +21,17 @@ export default function CallRecordings() {
     });
     const { recordings, loading, error } = useCallRecordingsOptimized(50, dateRange);
     const [selectedRecording, setSelectedRecording] = useState<CallRecording | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredRecordings = useMemo(() => {
+        if (!searchQuery.trim()) return recordings;
+        const q = searchQuery.toLowerCase();
+        return recordings.filter((r) =>
+            (r.phone_number && r.phone_number.toLowerCase().includes(q)) ||
+            (r.recording_transcript && r.recording_transcript.toLowerCase().includes(q)) ||
+            (r.client_personal_id && r.client_personal_id.toLowerCase().includes(q))
+        );
+    }, [recordings, searchQuery]);
 
     if (loading) {
         return (
@@ -51,7 +62,8 @@ export default function CallRecordings() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Call Recordings</h1>
                     <p className="text-muted-foreground">
-                        {recordings.length} recordings found
+                        {filteredRecordings.length} recordings found
+                        {searchQuery && ` (din ${recordings.length})`}
                         {dateRange?.from && " (Filtered)"}
                     </p>
                 </div>
@@ -60,11 +72,22 @@ export default function CallRecordings() {
                 </div>
             </div>
 
+            {/* Search Bar */}
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    placeholder="Caută după telefon, transcript sau ID client..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                />
+            </div>
+
             {/* Compact list */}
             <Card>
                 <CardContent className="p-0">
                     <div className="divide-y divide-border">
-                        {recordings.map((recording) => (
+                        {filteredRecordings.map((recording) => (
                             <button
                                 key={recording.id}
                                 onClick={() => setSelectedRecording(recording)}
@@ -92,9 +115,9 @@ export default function CallRecordings() {
                             </button>
                         ))}
 
-                        {recordings.length === 0 && (
+                        {filteredRecordings.length === 0 && (
                             <div className="text-center py-12 text-muted-foreground">
-                                No recordings found.
+                                {searchQuery ? "Nicio înregistrare găsită pentru căutarea ta." : "No recordings found."}
                             </div>
                         )}
                     </div>
